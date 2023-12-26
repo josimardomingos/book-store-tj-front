@@ -14,6 +14,7 @@ import { HomeIcon } from "../../icons/sidebar/home-icon";
 import { ReportsIcon } from "../../icons/sidebar/reports-icon";
 import { ProductsIcon } from "../../icons/sidebar/products-icon";
 import { BalanceIcon } from "../../icons/sidebar/balance-icon";
+import { ExportIcon } from "../../icons/accounts/export-icon";
 
 export const SidebarWrapper = () => {
   const pathname = usePathname();
@@ -62,6 +63,11 @@ export const SidebarWrapper = () => {
                 icon={<ProductsIcon />}
                 isActive={pathname === "/painel/autores"}
                 href="/painel/autores"
+              />
+              <SidebarItem
+                title="Baixar Relatório"
+                icon={<ExportIcon />}
+                href={`${process.env.NEXT_PUBLIC_API_URI}/relatorio?download`}
               />
             </SidebarMenu>
           </div>

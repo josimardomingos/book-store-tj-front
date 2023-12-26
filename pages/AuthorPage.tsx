@@ -34,6 +34,7 @@ import {
   autorUpdateService,
 } from "@/modules/Autor/services";
 import { AutorData } from "@/modules/Autor/types";
+import { avatares } from "@/modules/Autor/avatares";
 
 export const metadata: Metadata = {
   title: "Autores",
@@ -42,34 +43,6 @@ export const metadata: Metadata = {
 const columns = [
   { name: "NOME", uid: "nome" },
   { name: "AÇÕES", uid: "actions" },
-];
-
-const avatares = [
-  "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-  "https://i.pravatar.cc/150?u=a04258114e29026702d",
-  "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-  "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-  "https://i.pravatar.cc/150?u=a04258114e29026702d",
-  "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-  "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-  "https://i.pravatar.cc/150?u=a04258114e29026702d",
-  "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-  "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-  "https://i.pravatar.cc/150?u=a04258114e29026702d",
-  "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-  "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-  "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-  "https://i.pravatar.cc/150?u=a04258114e29026702d",
-  "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-  "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
 ];
 
 export default function AuthorPage() {

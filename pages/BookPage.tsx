@@ -24,6 +24,7 @@ import {
   Select,
   Chip,
   SelectItem,
+  Avatar,
 } from "@nextui-org/react";
 import Swal from "sweetalert2";
 
@@ -38,13 +39,17 @@ import {
 import { LivroData } from "@/modules/Livro/types";
 import { AssuntoData } from "@/modules/Assunto/types";
 import { assuntoIndexService } from "@/modules/Assunto/services";
+import { autorIndexService } from "@/modules/Autor/services";
+import { AutorData } from "@/modules/Autor/types";
+import { avatares } from "@/modules/Autor/avatares";
 
 export const metadata: Metadata = {
   title: "Livros",
 };
 
 type LivroForm = LivroData & {
-  assuntos_cod: number[];
+  assuntos_cod?: number[];
+  autores_cod?: number[];
 };
 
 const columns = [
@@ -61,9 +66,10 @@ export default function BookPage() {
   const [livros, setLivros] = useState<LivroData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isCreating, setIsCreating] = useState<boolean>(true);
-  const [initialState, setInitialState] = useState<LivroData>();
+  const [initialState, setInitialState] = useState<LivroForm>();
 
   const [assuntos, setAssuntos] = useState<AssuntoData[]>([]);
+  const [autores, setAutores] = useState<AutorData[]>([]);
 
   const handleDeleteLivro = (livro: LivroData) => {
     Swal.fire({
@@ -91,6 +97,16 @@ export default function BookPage() {
   };
 
   const handleEditarLivro = (livro: LivroData) => {
+    livro.assuntos_cod = new Set(
+      livro.assuntos.map((assunto) => `${assunto.codas}`)
+    );
+    livro.autores_cod = new Set(livro.autores.map((autor) => `${autor.codau}`));
+    // return console.log(
+    //   "🚀 ~ file: BookPage.tsx:102 ~ handleEditarLivro ~ livro:",
+    //   livro
+    // );
+    // livro.assuntos_cod = new Set(["11", "8"]);
+
     setInitialState(livro);
     setIsCreating(false);
     onOpen();
@@ -104,24 +120,15 @@ export default function BookPage() {
       anopublicacao: "2023",
       edicao: 0,
       valor: 0,
+      assuntos_cod: new Set([]),
+      autores_cod: new Set([]),
     });
     onOpen();
   };
 
   const handleGravarLivro = async (onClose: () => void) => {
-    let codas;
-    if (initialState.assuntos) {
-      codas = initialState.assuntos.map((assunto) => {
-        return assunto.codas;
-      });
-      initialState.assuntos = codas;
-    }
-    console.log(
-      "🚀 ~ file: BookPage.tsx:119 ~ handleGravarLivro ~ initialState:",
-      initialState,
-      codas
-    );
-    return;
+    initialState.assuntos = Array.from(initialState?.assuntos_cod);
+    initialState.autores = Array.from(initialState?.autores_cod);
 
     let resp;
     if (isCreating) {
@@ -181,9 +188,15 @@ export default function BookPage() {
     setAssuntos(response.data);
   };
 
+  const fetchAutores = async () => {
+    const response = await autorIndexService();
+    setAutores(response.data);
+  };
+
   useEffect(() => {
     fetchData();
     fetchAssuntos();
+    fetchAutores();
   }, []);
 
   return (
@@ -293,39 +306,46 @@ export default function BookPage() {
                       }
                     />
                   </div>
+                  <div>
+                    <Input
+                      type="number"
+                      label="Valor"
+                      variant="bordered"
+                      placeholder="0,00"
+                      maxLength={6}
+                      value={initialState?.valor}
+                      onValueChange={(value) =>
+                        setInitialState((prevState) => ({
+                          ...prevState,
+                          valor: value,
+                        }))
+                      }
+                      startContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">
+                            R$
+                          </span>
+                        </div>
+                      }
+                    />
+                  </div>
                 </div>
-                <Input
-                  type="number"
-                  label="Valor"
-                  variant="bordered"
-                  placeholder="0,00"
-                  value={initialState?.valor}
-                  onValueChange={(value) =>
-                    setInitialState((prevState) => ({
-                      ...prevState,
-                      valor: value,
-                    }))
-                  }
-                  startContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small">R$</span>
-                    </div>
-                  }
-                />
+
                 <Select
                   items={assuntos}
+                  selectedKeys={initialState?.assuntos_cod}
                   label="Assuntos"
                   variant="bordered"
                   isMultiline={true}
                   selectionMode="multiple"
                   placeholder="Selecione os assuntos"
                   labelPlacement="outside"
+                  fullWidth
                   classNames={{
                     base: "max-w-xs",
                     trigger: "min-h-unit-12 py-2",
                   }}
                   renderValue={(items) => {
-                    console.log("items", items);
                     return (
                       <div className="flex flex-wrap gap-2">
                         {items.map((item) => (
@@ -334,10 +354,17 @@ export default function BookPage() {
                       </div>
                     );
                   }}
+                  onChange={(value) =>
+                    setInitialState((prevState) => ({
+                      ...prevState,
+                      assuntos_cod: new Set(value.target.value.split(",")),
+                    }))
+                  }
                 >
                   {(assunto) => (
                     <SelectItem
                       key={assunto.codas}
+                      value={assunto.codas}
                       textValue={assunto.descricao}
                     >
                       <div className="flex gap-2 items-center">
@@ -345,9 +372,63 @@ export default function BookPage() {
                           <span className="text-small">
                             {assunto.descricao}
                           </span>
-                          <span className="text-tiny text-default-400">
+                          {/* <span className="text-tiny text-default-400">
                             {assunto.descricao}
-                          </span>
+                          </span> */}
+                        </div>
+                      </div>
+                    </SelectItem>
+                  )}
+                </Select>
+
+                <Select
+                  items={autores}
+                  selectedKeys={initialState?.autores_cod}
+                  label="Autores"
+                  variant="bordered"
+                  isMultiline={true}
+                  selectionMode="multiple"
+                  placeholder="Selecione um ou mais autores"
+                  labelPlacement="outside"
+                  fullWidth
+                  classNames={{
+                    base: "max-w-xs",
+                    trigger: "min-h-unit-12 py-2",
+                  }}
+                  renderValue={(items) => {
+                    return (
+                      <div className="flex flex-wrap gap-2">
+                        {items.map((item) => (
+                          <Chip key={item.key}>{item.data.nome}</Chip>
+                        ))}
+                      </div>
+                    );
+                  }}
+                  onChange={(value) =>
+                    setInitialState((prevState) => ({
+                      ...prevState,
+                      autores_cod: new Set(value.target.value.split(",")),
+                    }))
+                  }
+                >
+                  {(autor) => (
+                    <SelectItem
+                      key={autor.codau}
+                      value={autor.codau}
+                      textValue={autor.nome}
+                    >
+                      <div className="flex gap-2 items-center">
+                        <Avatar
+                          alt={autor.nome}
+                          className="flex-shrink-0"
+                          size="sm"
+                          src={avatares[autor.codau] || 1}
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-small">{autor.nome}</span>
+                          {/* <span className="text-tiny text-default-400">
+                            {autor.nome}
+                          </span> */}
                         </div>
                       </div>
                     </SelectItem>
